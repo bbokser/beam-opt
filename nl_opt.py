@@ -1,12 +1,43 @@
 import nlopt
 import numpy as np
 
-E = 110e9  # Pa
-shear_str = 600e6  # Pa
-yield_str = 910e6  # Pa
-density = 4.43 * 1000  # g/cc -> kg/m3
+material = 'cfrp'
+# material = 'aluminum'
+
+print("Using material = ", material)
+
+if material == 'titanium':
+    # Annealed Grade 5 Titanium
+    # https://www.makeitfrom.com/material-properties/Annealed-Grade-5-Titanium
+    E = 110e9  # Pa
+    shear_str = 600e6  # Pa
+    yield_str = 910e6  # Pa
+    density = 4430  # g/cc -> kg/m3
+    SF = 2  # safety factor
+
+elif material == 'cfrp':
+    # CFRP Tube from Dragonplate, 0/90
+    # e.g. https://dragonplate.com/carbon-fiber-roll-wrapped-twill-tube-2-id-x-96-thin-wall-gloss-finish
+    # http://www.performance-composites.com/carbonfibre/mechanicalproperties_2.asp
+    E = 5.171059e11
+    shear_str = 90e6
+    yield_str = 600e6  # Pa  # actually just UTS
+    density = 1522  # kg/m3
+    SF = 4  # safety factor
+
+elif material == 'aluminum':
+    # Aluminum 7075-T6
+    # https://www.makeitfrom.com/material-properties/7075-T6-Aluminum
+    E = 70e9
+    shear_str = 330e6
+    yield_str = 480e6  # Pa  # actually just UTS
+    density = 2710  # kg/m3
+    SF = 2  # safety factor
+
+else:
+    raise Exception("Invalid material choice")
+
 m = 20  # kg
-SF = 2  # safety factor
 g = 9.81
 L = 0.25
 def_max = 0.0005  # mm
@@ -14,7 +45,7 @@ def_max = 0.0005  # mm
 P = m * g * SF
 M = P * L
 
-min_thickness = 0.002
+min_thickness = 0.0005
 
 def objfunc(x, grad):
     if grad.size > 0:
@@ -34,6 +65,12 @@ def tensile_constr(x, grad):
         grad[1] = yield_str * np.pi * 4 * x[1]**3
     return 4 * M * x[0] - yield_str * np.pi * (x[0]**4 - x[1]**4)
 
+def def_constr(x, grad):
+    if grad.size > 0:
+        grad[0] = -def_max * 12 * E * np.pi * x[0]**3 
+        grad[1] = def_max * 12 * E * np.pi * x[1]**3
+    return 4 * P * L**3 - def_max * 3 * E * np.pi * (x[0]**4 - x[1]**4)
+
 def thickness_constr(x, grad):
     if grad.size > 0:
         grad[0] = -1
@@ -47,8 +84,9 @@ opt.set_min_objective(objfunc)
 opt.add_inequality_constraint(lambda x, grad:shear_constr(x, grad), 1e-8)
 opt.add_inequality_constraint(lambda x, grad:tensile_constr(x, grad), 1e-8)
 opt.add_inequality_constraint(lambda x, grad:thickness_constr(x, grad), 1e-8)
+opt.add_inequality_constraint(lambda x, grad:def_constr(x, grad), 1e-8)
 opt.set_xtol_rel(1e-6)
-x = opt.optimize([0.1, 0.098])
+x = opt.optimize([0.06, 0.057])
 minf = opt.last_optimum_value()
 print("optimum at ", x[0], ", ", x[1])
 print("minimum value = ", minf)
@@ -69,16 +107,21 @@ print("Cross-Sectional Area = ", A)
 
 M_max = P * L
 max_tensile_stress = M_max * R / I
-# assert sigfig.round(yield_str, 4) == sigfig.round(max_tensile_stress, 4)
-# assert max_tensile_stress < yield_str
+assert yield_str > max_tensile_stress
 print("Maximum tensile stress = ", max_tensile_stress)
-print("Max tensile stress exceeded by factor of ", max_tensile_stress/yield_str)
+print("Yield Strength exceeded by factor of ", max_tensile_stress/yield_str)
 
 max_shear_stress = 2 * P / A
 assert shear_str > max_shear_stress
 # assert sigfig.round(shear_str, 4) == sigfig.round(max_shear_stress, 4)
 print("Maximum shear stress = ", max_shear_stress)
-print("Max shear stress exceeded by factor of ", max_shear_stress/shear_str)
+print("Shear strength exceeded by factor of ", max_shear_stress/shear_str)
+
+# deflection check
+deflection = P * L**3 / (3 * E * I)
+assert def_max > deflection
+print("Deflection = ", deflection * 1000, " mm")
+print("Deflection limit exceeded by factor of ", deflection/def_max)
 
 print("Thickness = ", (R - r)*1000, " mm")
 
