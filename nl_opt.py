@@ -34,7 +34,7 @@ elif material == 'aluminum':
     # https://www.makeitfrom.com/material-properties/7075-T6-Aluminum
     E = 70e9
     shear_str = 330e6
-    yield_str = 480e6  # Pa  # actually just UTS
+    yield_str = 480e6  # Pa
     density = 2710  # kg/m3
     SF = 2  # safety factor
     min_thickness = 0.0004064  # 0.016" = 0.4064 mm
