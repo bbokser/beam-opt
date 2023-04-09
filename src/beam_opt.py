@@ -2,11 +2,10 @@ import nlopt
 import numpy as np
 
 
-def opt(material, L, def_max, P, M, M_axial):
+def opt(material, Lx, def_max, thickness_min, P, Mx, My):
     E = material["E"]
     shear_str = material["shear_str"]
     yield_str = material["yield_str"]
-    min_thickness = material["min_thickness"]
 
     def objfunc(x, grad):
         if grad.size > 0:
@@ -16,31 +15,31 @@ def opt(material, L, def_max, P, M, M_axial):
 
     def shear_constr(x, grad):
         if grad.size > 0:
-            grad[0] = np.pi * M_axial * x[0] * (2 * x[0]**2 + (x[0]**2 - x[1]**2)) + \
+            grad[0] = np.pi * My * x[0] * (2 * x[0]**2 + (x[0]**2 - x[1]**2)) + \
                 4 * x[0]**3 * P * np.pi + \
                 - np.pi**2 * shear_str * (2 * x[0]**3 * (x[0]**2 - x[1]**2) - x[0] * (x[0]**4 - x[1]**4))
-            grad[1] = - 2 * M_axial * x[0] * x[1] * np.pi * 2 + \
+            grad[1] = - 2 * My * x[0] * x[1] * np.pi * 2 + \
                 - 8 * x[1]**3 * P + \
                 - np.pi**2 * x[1]**2 * shear_str * (2 * x[1] * (x[0]**2 - x[1]**2) + (x[0]**4 - x[1]**4))
-        return M_axial * x[0] * np.pi * (x[0]**2 - x[1]**2)  + P * np.pi * (x[0]**4 - x[1]**4) - shear_str * np.pi**2 * (x[0]**4 - x[1]**4) * (x[0]**2 - x[1]**2)
+        return My * x[0] * np.pi * (x[0]**2 - x[1]**2)  + P * np.pi * (x[0]**4 - x[1]**4) - shear_str * np.pi**2 * (x[0]**4 - x[1]**4) * (x[0]**2 - x[1]**2)
 
     def tensile_constr(x, grad):
         if grad.size > 0:
-            grad[0] = 4 * M - yield_str * np.pi * 4 * x[0]**3
+            grad[0] = 4 * Mx - yield_str * np.pi * 4 * x[0]**3
             grad[1] = yield_str * np.pi * 4 * x[1]**3
-        return 4 * M * x[0] - yield_str * np.pi * (x[0]**4 - x[1]**4)
+        return 4 * Mx * x[0] - yield_str * np.pi * (x[0]**4 - x[1]**4)
 
     def def_constr(x, grad):
         if grad.size > 0:
             grad[0] = -def_max * 12 * E * np.pi * x[0]**3 
             grad[1] = def_max * 12 * E * np.pi * x[1]**3
-        return 4 * P * L**3 - def_max * 3 * E * np.pi * (x[0]**4 - x[1]**4)
+        return 4 * P * Lx**3 - def_max * 3 * E * np.pi * (x[0]**4 - x[1]**4)
 
     def thickness_constr(x, grad):
         if grad.size > 0:
             grad[0] = -1
             grad[1] = 1
-        return -x[0] + x[1] + min_thickness
+        return -x[0] + x[1] + thickness_min
 
     opt = nlopt.opt(nlopt.LD_MMA, 2)
     opt.set_lower_bounds([0.010, 0.010])

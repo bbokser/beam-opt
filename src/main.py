@@ -8,9 +8,10 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("material", help="enter the material", choices=["titanium", "cfrp", "aluminum"], type=str, default="titanium")
 parser.add_argument("mass", help="enter the mass at the end-effector", type=float, default=20.0)
-parser.add_argument("L_beam", help="enter the length of the beam", type=float, default=0.25)
-parser.add_argument("L_ee", help="enter the length of the end-effector", type=float, default=0.05)
+parser.add_argument("Lx", help="enter the length of the beam", type=float, default=0.25)
+parser.add_argument("Ly", help="enter the axial offset distance", type=float, default=0.05)
 parser.add_argument("def_max", help="enter the maximum beam deflection allowed", type=float, default=0.0005)
+parser.add_argument("thickness_min", help="enter the minimum wall thickness allowed", type=float, default=0.0004064)
 args = parser.parse_args()
 
 print("Using material = ", args.material)
@@ -30,16 +31,16 @@ density = mat["density"]
 SF = mat["SF"]
 
 m = args.mass
-L = args.L_beam
-L_ee = args.L_ee
+Lx = args.Lx
+Ly = args.Ly
 def_max = args.def_max
 
 g = 9.81
 P = m * g * SF
-M = P * L  # moment acting on beam lengthwise
-M_axial = P * L_ee  # axial moment due to end effector
+Mx = P * Lx  # moment acting on beam lengthwise
+My = P * Ly  # axial moment due to end effector
 
-R, r = opt(material=mat, L=L, def_max=def_max, P=P, M=M, M_axial=M_axial)
+R, r = opt(material=mat, Lx=Lx, def_max=def_max, thickness_min=args.thickness_min, P=P, M=Mx, My=My)
 
 assert R > r
 print("R = ", R, " m")
@@ -52,7 +53,7 @@ A = np.pi * (R**2 - r**2)
 print("Cross-Sectional Area = ", A, " m^2")
 print("\n")
 
-M_max = P * L
+M_max = P * Lx
 max_tensile_stress = M_max * R / I
 assert yield_str >= max_tensile_stress
 print("Maximum tensile stress = ", max_tensile_stress, " Pa")
@@ -65,7 +66,7 @@ print("Shear stress due to downward force, max = ", max_shear_stress, " Pa")
 
 # torsion check
 J = np.pi * (R**4 - r**4) / 2  # polar moment of inertia
-shear_torsional = M_axial * R / J
+shear_torsional = My * R / J
 print("Torsional shear = ", shear_torsional, " Pa")
 
 max_shear_stress_total = max_shear_stress + shear_torsional
@@ -75,14 +76,14 @@ print("Shear stress / Shear Strength = ", max_shear_stress_total/shear_str)
 print("\n")
 
 # deflection check
-deflection = P * L**3 / (3 * E * I)
+deflection = P * Lx**3 / (3 * E * I)
 print("Deflection = ", deflection * 1000, " mm")
 assert (def_max + 0.00001) >= deflection
 print("Deflection / Deflection Limit = ", deflection/def_max)
 print("\n")
 
 # buckling check
-P_critical = np.pi**2 * E * I / (L**2)
+P_critical = np.pi**2 * E * I / (Lx**2)
 assert P_critical >= P
 print("Critical load for buckling = ", P_critical, " N")
 print("Load / Critical Buckling Load Limit = ", P/P_critical)
@@ -90,7 +91,7 @@ print("\n")
 
 print("Thickness = ", (R - r)*1000, " mm")
 
-Vol = A * L
+Vol = A * Lx
 print("Total Volume = ", Vol, " m^3")
 m_beam = Vol * density
 print("Mass of the beam = ", m_beam, " kg")

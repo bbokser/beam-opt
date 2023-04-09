@@ -6,7 +6,7 @@ titanium = {
     "yield_str": 910e6,  # Pa
     "density": 4430,  # g/cc -> kg/m3
     "SF": 2,  # safety factor
-    "min_thickness": 0.0004064  # 0.016" = 0.4064 mm
+    "thickness_min": 0.0004064  # 0.016" = 0.4064 mm
 }
 
 cfrp = {
@@ -18,7 +18,7 @@ cfrp = {
     "yield_str": 600e6,  # Pa # actually just UTS
     "density": 1522,  # kg/m3
     "SF": 4,  # safety factor
-    "min_thickness": 0.000762
+    "thickness_min": 0.000762
 }
 
 aluminum = {
@@ -29,5 +29,5 @@ aluminum = {
     "yield_str": 480e6,  # Pa # actually just UTS
     "density": 2710,  # kg/m3
     "SF": 2,  # safety factor
-    "min_thickness": 0.0004064  # 0.016" = 0.4064 mm
+    "thickness_min": 0.0004064  # 0.016" = 0.4064 mm
 }
