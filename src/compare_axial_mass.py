@@ -13,7 +13,7 @@ import plots
 
 n = 3  # number of materials
 N = 20  # range
-force = np.zeros((n, N))
+axial_offset = np.zeros((n, N))
 mass = np.zeros((n, N))
 mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
 
@@ -27,21 +27,21 @@ for i in range(n):
     thickness_min = mat["thickness_min"]
     g = 9.81
     Lx = 0.25
-    Ly = 0.05
-    def_max = 0.0005
+    # Ly = 0.05
+    def_max = 0.001
+    m = 40
 
-    m = 0
     for j in range(N):
         P = m * g * SF
+        Ly = 0.01 + j * 0.05
         Mx = P * Lx  # moment acting on beam lengthwise
         My = P * Ly  # axial moment due to end effector
         R, r = opt(material=mat, Lx=Lx, def_max=def_max, thickness_min=thickness_min, P=P, Mx=Mx, My=My)
         A = np.pi * (R**2 - r**2)
         Vol = A * Lx
-        force[i, j] = m * g  # don't use SF for this
+        axial_offset[i, j] = Ly
         mass[i, j] = Vol * density  # mass of the beam
-        m += 4
 # print(force)
 # print(mass)
-plots.plot_gen(force, mass, ["titanium", "cfrp", "aluminum"], "Applied Force (N)")
+plots.plot_gen(axial_offset, mass, ["titanium", "cfrp", "aluminum"], "Axial Offset Ly (m)")
     

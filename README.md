@@ -38,7 +38,7 @@ For more information on virtual environments: https://docs.python.org/3/library/
 
 ```shell
 source env/bin/activate
-python3.8 -m pip install numpy sigfig nlopt
+python3.8 -m pip install numpy nlopt matplotlib argparse
 ```
 Don't use sudo here if you can help it, because it may modify your path and install the packages outside of the venv.
 
@@ -49,7 +49,6 @@ Don't use sudo here if you can help it, because it may modify your path and inst
 To run the optimization:
 
 ```shell
-python3.8 nl_opt.py
+cd src
+python3.8 main.py
 ```
-
-To change the material, edit lines 5-7 in the file.
