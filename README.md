@@ -34,7 +34,7 @@ python3.8 -m venv env
 ```
 For more information on virtual environments: https://docs.python.org/3/library/venv.html
     
-3. Activate the virtual environment, and then install numpy, scipy, matplotlib, sympy, transforms3d, pybullet, cvxpy, argparse, and more.
+3. Activate the virtual environment, and then install the following packages.
 
 ```shell
 source env/bin/activate
