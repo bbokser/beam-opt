@@ -50,5 +50,20 @@ To run the optimization:
 
 ```shell
 cd src
-python3.8 main.py
+python3.8 main.py titanium 30 0.3 0.05 0.001 0.0004064
 ```
+
+### Argparse Arguments
+
+- Material
+    - `titanium`, `aluminum`, or `cfrp`.
+- Mass
+    - The mass of the end-effector in kg.
+- $L_x$
+    - The length of the beam in meters.
+- $L_y$
+    - The axial offset distance of the end-effector mass from the beam axis.
+- Max Deflection
+    - Maximum beam deflection in meters.
+- Minimum Wall Thickness
+    - Minimum wall thickness in meters.
