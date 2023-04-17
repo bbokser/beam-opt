@@ -4,13 +4,6 @@ from beam_opt import opt
 import materials
 import plots
 
-# What should be tested:
-# 1. Force vs Beam Mass
-# 2. Axial Offset vs Beam Mass
-# 3. Shear Force vs Beam Mass
-# 4. Minimum Thickness vs Diameter
-# 5. Max deflection vs Beam Mass
-
 n = 3  # number of materials
 N = 20  # range
 force = np.zeros((n, N))
@@ -43,5 +36,5 @@ for i in range(n):
         m += 4
 # print(force)
 # print(mass)
-plots.plot_gen(force, mass, ["titanium", "cfrp", "aluminum"], "Applied Force (N)")
+plots.plot_gen(force, mass, ["titanium", "cfrp", "aluminum"], "Applied Force (N)", "Required Beam Mass (kg)")
     

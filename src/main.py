@@ -37,8 +37,8 @@ def_max = args.def_max
 
 g = 9.81
 P = m * g * SF
-Mx = P * Lx  # moment acting on beam lengthwise
-My = P * Ly  # axial moment due to end effector
+My = P * Lx  # moment acting on beam lengthwise
+Mx = P * Ly  # axial moment due to end effector
 
 R, r = opt(material=mat, Lx=Lx, def_max=def_max, thickness_min=args.thickness_min, P=P, M=Mx, My=My)
 
