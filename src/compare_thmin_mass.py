@@ -27,9 +27,7 @@ for i in range(n):
     for j in range(N):
         P = m * g * SF
         thickness_min = 0.0005 + j * 0.001
-        Mx = P * Lx  # moment acting on beam lengthwise
-        My = P * Ly  # axial moment due to end effector
-        R, r = opt(material=mat, Lx=Lx, def_max=def_max, thickness_min=thickness_min, P=P, Mx=Mx, My=My)
+        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly)
         A = np.pi * (R**2 - r**2)
         Vol = A * Lx
         thmin[i, j] = thickness_min

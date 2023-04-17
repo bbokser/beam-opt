@@ -2,10 +2,12 @@ import nlopt
 import numpy as np
 
 
-def opt(material, Lx, def_max, thickness_min, P, My, Mx):
+def opt(material, def_max, thickness_min, P, Lx, Ly):
     E = material["E"]
     shear_str = material["shear_str"]
     yield_str = material["yield_str"]
+    My = P * Lx
+    Mx = P * Ly
 
     def objfunc(x, grad):
         if grad.size > 0:
@@ -15,13 +17,17 @@ def opt(material, Lx, def_max, thickness_min, P, My, Mx):
 
     def shear_constr(x, grad):
         if grad.size > 0:
-            grad[0] = np.pi * Mx * x[0] * (2 * x[0]**2 + (x[0]**2 - x[1]**2)) + \
-                4 * x[0]**3 * P * np.pi + \
-                - np.pi**2 * shear_str * (2 * x[0]**3 * (x[0]**2 - x[1]**2) - x[0] * (x[0]**4 - x[1]**4))
-            grad[1] = - 2 * Mx * x[0] * x[1] * np.pi * 2 + \
-                - 8 * x[1]**3 * P + \
-                - np.pi**2 * x[1]**2 * shear_str * (2 * x[1] * (x[0]**2 - x[1]**2) + (x[0]**4 - x[1]**4))
-        return Mx * x[0] * np.pi * (x[0]**2 - x[1]**2)  + P * np.pi * (x[0]**4 - x[1]**4) - shear_str * np.pi**2 * (x[0]**4 - x[1]**4) * (x[0]**2 - x[1]**2)
+            grad[0] = np.pi * (3 * Mx * x[0]**2 + \
+                - Mx * x[1]**2 + \
+                4 * x[0]**3 * P + \
+                - shear_str * np.pi  * (3 * x[0]**5 - 2 * x[0]**3 * x[1]**2 - x[0] * x[1]**4))
+            grad[1] = np.pi * (-2 * Mx * x[0] * x[1] + \
+                - 4 * x[1]**3 * P + \
+                - shear_str * np.pi * (- x[1] * x[0]**4 + 3 * x[1]**5 - 2 * x[1]**3 * x[0]**2))
+    
+        return np.pi * (Mx * x[0] * (x[0]**2 - x[1]**2) + \
+                        P * (x[0]**4 - x[1]**4) - \
+                        0.5 * shear_str * np.pi * (x[0]**4 - x[1]**4) * (x[0]**2 - x[1]**2))
 
     def tensile_constr(x, grad):
         if grad.size > 0:
@@ -42,18 +48,23 @@ def opt(material, Lx, def_max, thickness_min, P, My, Mx):
         return -x[0] + x[1] + thickness_min
 
     opt = nlopt.opt(nlopt.LD_MMA, 2)
-    opt.set_lower_bounds([0.010, 0.010])
-    opt.set_upper_bounds([0.075, 0.075])
+    min = 0.01
+    max = 0.5
+    opt.set_lower_bounds([min, min-thickness_min])
+    opt.set_upper_bounds([max, max-thickness_min])
     opt.set_min_objective(objfunc)
     opt.add_inequality_constraint(lambda x, grad:shear_constr(x, grad), 1e-8)
     opt.add_inequality_constraint(lambda x, grad:tensile_constr(x, grad), 1e-8)
     opt.add_inequality_constraint(lambda x, grad:thickness_constr(x, grad), 1e-8)
     opt.add_inequality_constraint(lambda x, grad:def_constr(x, grad), 1e-8)
     opt.set_xtol_rel(1e-6)
-    x = opt.optimize([0.019, 0.018])
+    R0 = 0.04 # P * 0.0002  # heuristic for warm starting... :(
+    R0 = np.clip(R0, min, max)
+    print("Using R0 = ", R0)
+    # x = opt.optimize([0.019, 0.018])
     # x = opt.optimize([0.029, 0.028])
     # x = opt.optimize([0.046, 0.045])
-    # x = opt.optimize([0.057, 0.056])
+    x = opt.optimize([R0, R0 - thickness_min])
     minf = opt.last_optimum_value()
     print("optimum at ", x[0], ", ", x[1])
     print("minimum value = ", minf)
