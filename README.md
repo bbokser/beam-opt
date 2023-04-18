@@ -34,11 +34,11 @@ python3.8 -m venv env
 ```
 For more information on virtual environments: https://docs.python.org/3/library/venv.html
     
-3. Activate the virtual environment, and then install numpy, scipy, matplotlib, sympy, transforms3d, pybullet, cvxpy, argparse, and more.
+3. Activate the virtual environment, and then install the following packages.
 
 ```shell
 source env/bin/activate
-python3.8 -m pip install numpy sigfig nlopt
+python3.8 -m pip install numpy nlopt matplotlib argparse
 ```
 Don't use sudo here if you can help it, because it may modify your path and install the packages outside of the venv.
 
@@ -49,7 +49,21 @@ Don't use sudo here if you can help it, because it may modify your path and inst
 To run the optimization:
 
 ```shell
-python3.8 nl_opt.py
+cd src
+python3.8 main.py titanium 30 0.3 0.05 0.001 0.0004064
 ```
 
-To change the material, edit lines 5-7 in the file.
+### Argparse Arguments
+
+- Material
+    - `titanium`, `aluminum`, or `cfrp`.
+- Mass
+    - The mass of the end-effector in kg.
+- $L_x$
+    - The length of the beam in meters.
+- $L_y$
+    - The axial offset distance of the end-effector mass from the beam axis.
+- Max Deflection
+    - Maximum beam deflection in meters.
+- Minimum Wall Thickness
+    - Minimum wall thickness in meters.
