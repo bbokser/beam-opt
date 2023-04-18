@@ -19,19 +19,20 @@ for i in range(n):
     SF = mat["SF"]
     thickness_min = mat["thickness_min"]
     g = 9.81
-    Lx = 3
-    Ly = 0.1
-    def_max = 3
+    Lx = 0.3
+    Ly = 0.05
+    def_max = 1 # 0.001
+    R0 = 0.03  # initial guess for R
 
-    m = 0
+    m = 80
     for j in range(N):
         P = m * g * SF
-        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly)
+        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly, R0=R0)
         A = np.pi * (R**2 - r**2)
         Vol = A * Lx
         force[i, j] = m * g  # don't use SF for this
         mass[i, j] = Vol * density  # mass of the beam
-        m += 6
+        m += 1
 # print(force)
 # print(mass)
 plots.plot_fit(force, mass, ["titanium", "cfrp", "aluminum"], "Applied Force (N)", "Required Beam Mass (kg)")

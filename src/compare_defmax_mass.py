@@ -19,15 +19,16 @@ for i in range(n):
     SF = mat["SF"]
     thickness_min = mat["thickness_min"]
     g = 9.81
-    Lx = 0.25
-    Ly = 0.05
+    Lx = 0.3
+    Ly = 0.005
     def_max = 0.0005
-    m = 20
-
+    m = 80
+    R0 = 0.03  # initial guess for R
+    
     for j in range(N):
         P = m * g * SF
-        def_max = 0.0005 + j * 0.0005
-        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly)
+        def_max = 0.0005 + j * 0.001
+        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly, R0=R0)
         A = np.pi * (R**2 - r**2)
         Vol = A * Lx
         deflection_max[i, j] = def_max
@@ -35,4 +36,5 @@ for i in range(n):
 # print(force)
 # print(mass)
 plots.plot_gen(deflection_max, mass, ["titanium", "cfrp", "aluminum"], "Required Max Deflection (m)", "Required Beam Mass (kg)")
+plots.plot_fit(deflection_max, mass, ["titanium", "cfrp", "aluminum"], "Required Max Deflection (m)", "Required Beam Mass (kg)")
     

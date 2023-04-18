@@ -2,7 +2,7 @@ import nlopt
 import numpy as np
 
 
-def opt(material, def_max, thickness_min, P, Lx, Ly):
+def opt(material, def_max, thickness_min, P, Lx, Ly, R0):
     E = material["E"]
     shear_str = material["shear_str"]
     yield_str = material["yield_str"]
@@ -58,12 +58,7 @@ def opt(material, def_max, thickness_min, P, Lx, Ly):
     opt.add_inequality_constraint(lambda x, grad:thickness_constr(x, grad), 1e-8)
     opt.add_inequality_constraint(lambda x, grad:def_constr(x, grad), 1e-8)
     opt.set_xtol_rel(1e-6)
-    R0 = 0.04 # P * 0.0002  # heuristic for warm starting... :(
     R0 = np.clip(R0, min, max)
-    print("Using R0 = ", R0)
-    # x = opt.optimize([0.019, 0.018])
-    # x = opt.optimize([0.029, 0.028])
-    # x = opt.optimize([0.046, 0.045])
     x = opt.optimize([R0, R0 - thickness_min])
     minf = opt.last_optimum_value()
     print("optimum at ", x[0], ", ", x[1])

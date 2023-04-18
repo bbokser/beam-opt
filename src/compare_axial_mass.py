@@ -23,11 +23,12 @@ for i in range(n):
     # Ly = 0.05
     def_max = 0.001
     m = 10
+    R0 = 0.04  # initial guess for R
 
     for j in range(N):
         P = m * g * SF
         Ly = 0.01 + j * 0.05
-        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly)
+        R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly, R0=R0)
         A = np.pi * (R**2 - r**2)
         Vol = A * Lx
         axial_offset[i, j] = Ly
