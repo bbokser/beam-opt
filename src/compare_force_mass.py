@@ -12,11 +12,8 @@ mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
 
 for i in range(n):
     mat = mat_list[i]
-    E = mat["E"]
-    shear_str = mat["shear_str"]
-    yield_str = mat["yield_str"]
     density = mat["density"]
-    SF = mat["SF"]
+    SF = 2
     thickness_min = mat["thickness_min"]
     g = 9.81
     Lx = 0.3

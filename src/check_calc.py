@@ -2,9 +2,10 @@ import numpy as np
 
 
 def check(material, def_max, P, Lx, Ly, R, r):
-    E = material["E"]
+    E_flex = material["E_flex"]
+    E_comp = material["E_comp"]
     shear_str = material["shear_str"]
-    yield_str = material["yield_str"]
+    yield_str = material["flex_str"]
     density = material["density"]
     My = P * Lx
     Mx = P * Ly
@@ -42,14 +43,14 @@ def check(material, def_max, P, Lx, Ly, R, r):
     print("\n")
 
     # deflection check
-    deflection = P * Lx**3 / (3 * E * I)
+    deflection = P * Lx**3 / (3 * E_flex * I)
     print("Deflection = ", deflection * 1000, " mm")
     print("Deflection / Deflection Limit = ", deflection/def_max)
     assert (def_max + 0.00001) >= deflection
     print("\n")
 
     # buckling check
-    P_critical = np.pi**2 * E * I / (Lx**2)
+    P_critical = np.pi**2 * E_comp * I / (Lx**2)
     print("Critical load for buckling = ", P_critical, " N")
     print("Load / Critical Buckling Load Limit = ", P/P_critical)
     assert P_critical >= P

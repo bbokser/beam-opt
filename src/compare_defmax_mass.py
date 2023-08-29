@@ -12,18 +12,15 @@ mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
 
 for i in range(n):
     mat = mat_list[i]
-    E = mat["E"]
-    shear_str = mat["shear_str"]
-    yield_str = mat["yield_str"]
     density = mat["density"]
-    SF = mat["SF"]
+    SF = 2
     thickness_min = mat["thickness_min"]
     g = 9.81
     Lx = 0.3
     Ly = 0.005
     def_max = 0.0005
-    m = 80
-    R0 = 0.03  # initial guess for R
+    m = 30
+    R0 = 0.018  # initial guess for R
     
     for j in range(N):
         P = m * g * SF

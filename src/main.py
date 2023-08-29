@@ -25,11 +25,12 @@ elif args.material=="aluminum":
 else:
     raise Exception("Invalid material choice")
 
-E = mat["E"]
+E_flex = mat["E_flex"]
+E_comp = mat["E_comp"]
 shear_str = mat["shear_str"]
-yield_str = mat["yield_str"]
+flex_str = mat["flex_str"]
 density = mat["density"]
-SF = mat["SF"]
+SF = 2
 
 m = args.mass
 Lx = args.Lx
