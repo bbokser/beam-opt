@@ -9,18 +9,17 @@ N = 20  # range
 axial_offset = np.zeros((n, N))
 mass = np.zeros((n, N))
 mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
+SF = 2
+g = 9.81
+Lx = 0.3
+def_max = 0.001
+m = 10
+R0 = 0.04  # initial guess for R
 
 for i in range(n):
     mat = mat_list[i]
     density = mat["density"]
-    SF = 2
     thickness_min = mat["thickness_min"]
-    g = 9.81
-    Lx = 0.3
-    # Ly = 0.05
-    def_max = 0.001
-    m = 10
-    R0 = 0.04  # initial guess for R
 
     for j in range(N):
         P = m * g * SF

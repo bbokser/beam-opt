@@ -9,18 +9,18 @@ N = 20  # range
 force = np.zeros((n, N))
 mass = np.zeros((n, N))
 mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
+g = 9.81
+Lx = 0.3
+Ly = 0.05
+def_max = 1 # 0.001
+R0 = 0.03  # initial guess for R
+SF = 2
 
 for i in range(n):
     mat = mat_list[i]
     density = mat["density"]
-    SF = 2
     thickness_min = mat["thickness_min"]
-    g = 9.81
-    Lx = 0.3
-    Ly = 0.05
-    def_max = 1 # 0.001
-    R0 = 0.03  # initial guess for R
-
+    
     m = 80
     for j in range(N):
         P = m * g * SF
