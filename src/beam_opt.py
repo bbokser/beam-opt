@@ -3,9 +3,9 @@ import numpy as np
 
 
 def opt(material, def_max, thickness_min, P, Lx, Ly, R0):
-    E = material["E"]
+    E = material["E_flex"]
     shear_str = material["shear_str"]
-    yield_str = material["yield_str"]
+    yield_str = material["flex_str"]
     My = P * Lx
     Mx = P * Ly
 

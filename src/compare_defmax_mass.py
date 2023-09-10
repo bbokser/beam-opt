@@ -9,24 +9,20 @@ N = 20  # range
 deflection_max = np.zeros((n, N))
 mass = np.zeros((n, N))
 mat_list = [materials.titanium, materials.cfrp, materials.aluminum]
+g = 9.81
+Lx = 0.3
+Ly = 0.005
+def_max = 0.0005
+m = 30
+R0 = 0.018  # initial guess for R
+SF = 2
+P = m * g * SF
 
 for i in range(n):
     mat = mat_list[i]
-    E = mat["E"]
-    shear_str = mat["shear_str"]
-    yield_str = mat["yield_str"]
     density = mat["density"]
-    SF = mat["SF"]
     thickness_min = mat["thickness_min"]
-    g = 9.81
-    Lx = 0.3
-    Ly = 0.005
-    def_max = 0.0005
-    m = 80
-    R0 = 0.03  # initial guess for R
-    
     for j in range(N):
-        P = m * g * SF
         def_max = 0.0005 + j * 0.001
         R, r = opt(material=mat, def_max=def_max, thickness_min=thickness_min, P=P, Lx=Lx, Ly=Ly, R0=R0)
         A = np.pi * (R**2 - r**2)
